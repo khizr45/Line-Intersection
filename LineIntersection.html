@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Line Intersection</title>
+</head>
+<body>
+    <input placeholder="Line 1 pt 1 x1" id="x1"/>
+    <input placeholder="Line 1 pt 1 y1" id="y1"/>
+    <input placeholder="Line 1 pt 2 x2" id="x2"/>
+    <input placeholder="Line 1 pt 2 y2" id="y2"/>
+    <input placeholder="Line 2 pt 1 x3" id="x3"/>
+    <input placeholder="Line 2 pt 1 y3" id="y3"/>
+    <input placeholder="Line 2 pt 2 x4" id="x4"/>
+    <input placeholder="Line 2 pt 2 y4" id="y4"/>
+    <select id="menu">
+        <option>Line Intersection Methods</option>
+        <option>Line CCW</option>
+        <option>Slope Intercept</option>
+        <option>Determinant Method</option>
+    </select>
+    <button onclick="PickPoints()">Go</button>
+    <div id="Working"></div>
+    <div id="plot"></div>
+    <script>
+        function PickPoints(){
+            var strVal = document.getElementById("x1").value;
+            var x1 = parseInt(strVal);
+            strVal = document.getElementById("x2").value;
+            var x2 = parseInt(strVal);
+            strVal = document.getElementById("y1").value;
+            var y1 = parseInt(strVal);
+            strVal = document.getElementById("y2").value;
+            var y2 = parseInt(strVal);
+            console.log("(",x1,y1,")","(",x2,y2,")");
+            strVal = document.getElementById("x3").value;
+            var x3 = parseInt(strVal);
+            strVal = document.getElementById("x4").value;
+            var x4 = parseInt(strVal);
+            strVal = document.getElementById("y3").value;
+            var y3 = parseInt(strVal);
+            strVal = document.getElementById("y4").value;
+            var y4 = parseInt(strVal);
+            const lines = {
+                x:[x1,x2],y:[y1,y2],type:"scatter",mode:"lines+markers"
+            };
+            const lines2 = {
+                x:[x3,x4],y:[y3,y4],type:"scatter",mode:"lines+markers"
+            };
+            const layout = {
+                title: "Line Intersection",
+                xaxis: { title: "X Axis" },
+                yaxis: { title: "Y AXIS" }
+            }
+
+            var strVal = document.getElementById("menu").value;
+            if(strVal === "Line CCW"){
+                document.getElementById("Working").textContent = "";
+                Plotly.newPlot('plot',[lines,lines2],layout);
+                setTimeout(() => {
+                    LineCCW(x1,y1,x2,y2,x3,y3,x4,y4);
+                }, 2000);
+            }else if(strVal === "Slope Intercept"){
+                document.getElementById("Working").textContent = "";
+                Plotly.newPlot('plot',[lines,lines2],layout);
+                setTimeout(() => {
+                    GradientMethod(x1,y1,x2,y2,x3,y3,x4,y4);
+                }, 2000);
+            }else if(strVal === "Determinant Method"){
+                Plotly.newPlot('plot',[lines,lines2],layout);
+                setTimeout(() => {
+                    Determinant_Method(x1,y1,x2,y2,x3,y3,x4,y4);
+                }, 2000);
+            }
+            else{
+                document.getElementById("Working").textContent = "Please select method";
+            }
+        }
+        function LineCCW(x1,y1,x2,y2,x3,y3,x4,y4){
+            var test1,test2;
+            test1 = PointCCW(x1,y1,x2,y2,x3,y3)*PointCCW(x1,y1,x2,y2,x4,y4);
+            test2 = PointCCW(x3,y3,x4,y4,x1,y1)*PointCCW(x3,y3,x4,y4,x2,y2);
+            if(test1 <= 0 && test2 <= 0){
+                    alert("Lines Intersect");
+            }
+            else{
+                    alert("Lines Donot Intersect");
+            }
+        }
+        function GradientMethod(x1,y1,x2,y2,x3,y3,x4,y4){
+            var m1 = (y2-y1) / (x2-x1);
+            var m2 = (y4-y3) / (x4-x3);
+            var b1 = y1 - (m1*x1);
+            var b2 = y3 - (m2*x3);
+
+            var x = (b2-b1) / (m1-m2);
+
+            var y = (m1*x) + b1;
+
+            if(m1 != m2){
+                var msg = "Lines will Intersect at single point at ("+x+","+y+")";
+                alert(msg);
+            }else{
+                if(b1 != b2){
+                    alert("Parallel lines donot intersect");
+                }else{
+                    alert("Lines are coincident and intersect at infinite points");
+                }
+            }
+        }
+
+        function PointCCW(x1,y1,x2,y2,x3,y3){
+            return x1 * (y2 - y3) - y1 * (x2 - x3) + (x2 * y3 - y2 * x3);
+        }
+
+        function Determinant_Method(x1,y1,x2,y2,x3,y3,x4,y4){
+            var m1 = (y2-y1) / (x2-x1);
+            var m2 = (y4-y3) / (x4-x3);
+            var D = m1 - m2;
+
+            if(D != 0){
+                alert("Lines Intersect");
+            }else{
+                alert("Either Lines parallel or conincident");
+            }
+        }
+    </script>
+</body>
+</html>
